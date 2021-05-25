@@ -7,7 +7,7 @@ const Post = require('./models/post');
 
 const app = express();
 
-mongoose.connect("mongodb+srv://vibhor:cfoVnZ8SwTxcC9dN@cluster0.ubtub.mongodb.net/node-angular?retryWrites=true&w=majority", 
+mongoose.connect("mongodb+srv://vibhor:<password>@cluster0.ubtub.mongodb.net/node-angular?retryWrites=true&w=majority", 
     { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true })
     .then(() => {
         console.log("Connected to database");
