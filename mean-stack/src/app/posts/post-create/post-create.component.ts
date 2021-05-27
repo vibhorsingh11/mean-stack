@@ -16,7 +16,7 @@ export class PostCreateComponent implements OnInit {
   // change mode to enum
   private mode = 'create';
   private postId: string | any = '';
-  post: Post[] = [];
+  post: Post | undefined;
 
   constructor(
     private postService: PostService,
@@ -28,7 +28,9 @@ export class PostCreateComponent implements OnInit {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
         this.postId = paramMap.get('postId');
-        this.post = this.postService.getPostById(this.postId);
+        this.postService.getPostById(this.postId).subscribe((responseData) => {
+          this.post = responseData;
+        });
       } else {
         this.mode = 'create';
         this.postId = null;
