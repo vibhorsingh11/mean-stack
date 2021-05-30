@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 
 import { Post } from '../post.model';
@@ -18,11 +18,18 @@ export class PostCreateComponent implements OnInit {
   private postId: string | any = '';
   post: Post | undefined;
   isLoading = false;
+  form: FormGroup;
+  imagePreview: string;
 
-  constructor(
-    private postService: PostService,
-    private route: ActivatedRoute
-  ) {}
+  constructor(private postService: PostService, private route: ActivatedRoute) {
+    this.form = new FormGroup({
+      title: new FormControl(null, {
+        validators: [Validators.required, Validators.minLength(3)],
+      }),
+      content: new FormControl(null, { validators: [Validators.required] }),
+      image: new FormControl(null, { validators: [Validators.required] }),
+    });
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((paramMap) => {
@@ -33,6 +40,10 @@ export class PostCreateComponent implements OnInit {
         this.postService.getPostById(this.postId).subscribe((responseData) => {
           this.isLoading = false;
           this.post = responseData;
+          this.form.setValue({
+            title: this.post.title,
+            content: this.post.content,
+          });
         });
       } else {
         this.mode = 'create';
@@ -41,15 +52,15 @@ export class PostCreateComponent implements OnInit {
     });
   }
 
-  onSavePost(form: NgForm) {
-    if (form.invalid) {
+  onSavePost() {
+    if (this.form.invalid) {
       return;
     }
     this.isLoading = true;
     const post: Post = {
       id: 'null',
-      title: form.value.title,
-      content: form.value.content,
+      title: this.form.value.title,
+      content: this.form.value.content,
     };
     post.id = this.postId;
     if (this.mode == 'create') {
@@ -57,6 +68,17 @@ export class PostCreateComponent implements OnInit {
     } else {
       this.postService.updatePost(this.postId, post);
     }
-    form.resetForm();
+    this.form.reset();
+  }
+
+  onImagePicked(event: Event) {
+    const file = (event.target as HTMLInputElement).files[0];
+    this.form.patchValue({ image: file });
+    this.form.get('image').updateValueAndValidity();
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result.toString();
+    };
+    reader.readAsDataURL(file);
   }
 }
