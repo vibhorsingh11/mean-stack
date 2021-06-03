@@ -11,6 +11,7 @@ import { PostListComponent } from './posts/post-list/post-list.component';
 import { AppRoutingModule } from './app-routing.module';
 import { HeaderComponent } from './header/header.component';
 import { LoginComponent } from './auth/login/login/login.component';
+import { SignupComponent } from './auth/signup/signup/signup.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { LoginComponent } from './auth/login/login/login.component';
     PostListComponent,
     HeaderComponent,
     LoginComponent,
+    SignupComponent,
   ],
   imports: [
     BrowserModule,
