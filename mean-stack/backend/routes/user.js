@@ -47,13 +47,14 @@ router.post("/login", (req, res, next) => {
             });
         }
         const token = jwt.sign(
-            { email: user.email, userId: user._id},
+            { email: fetchedUser.email, userId: fetchedUser._id },
             "secret_key_this_should_be_properly_generated",
             { expiresIn: "1hr" }
         );
         res.status(200).json({
             token: token,
-            expiresIn: 3600
+            expiresIn: 3600,
+            userId: fetchedUser._id,
         });
     })
     .catch(err => {
