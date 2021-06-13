@@ -36,6 +36,7 @@ router.post("", chechAuth, multer({storage: storage}).single("image"), (req, res
         title: req.body.title,
         content: req.body.content,
         imagePath: url + '/images/' + req.file.filename,
+        creator: req.userData.userId
     });
     post.save().then(createdPost => {
         res.status(201).json({
@@ -91,18 +92,22 @@ router.put("/:id", chechAuth, multer({storage: storage}).single("image"), (req, 
         content: req.body.content,
         imagePath: imagePath,
     });
-    Post.updateOne({_id: req.params.id}, post).then(result => {
-        console.log(result);
-        res.status(200).json({ message: 'Post updated !!'})
+    Post.updateOne({_id: req.params.id, creator: req.userData.userId }, post).then(result => {
+        if(result.nModified > 0){
+            res.status(200).json({ message: 'Post updated !!'})
+        } else {
+            res.status(401).json({ message: 'Not authorized'})
+        }
     })
 })
 
 router.delete("/:id", chechAuth, (req,res,next) => {
-    Post.deleteOne({ _id: req.params.id }).then(result => {
-        console.log(result);
-        res.status(200).json({
-            message: 'Post added successfully'
-        });
+    Post.deleteOne({ _id: req.params.id, creator: req.userData.userId }).then(result => {
+        if(result.n > 0){
+            res.status(200).json({ message: 'Post Deleted!'})
+        } else {
+            res.status(401).json({ message: 'Not authorized'})
+        }
     });
 });
 
