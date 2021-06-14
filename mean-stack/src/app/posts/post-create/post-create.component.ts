@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService } from 'src/app/auth/auth.service';
 
 import { Post } from '../post.model';
 import { PostService } from '../posts.service';
@@ -11,7 +13,7 @@ import { mimetype } from './mime-type.validator';
   templateUrl: './post-create.component.html',
   styleUrls: ['./post-create.component.css'],
 })
-export class PostCreateComponent implements OnInit {
+export class PostCreateComponent implements OnInit, OnDestroy {
   content = '';
   title = '';
   // change mode to enum
@@ -21,8 +23,13 @@ export class PostCreateComponent implements OnInit {
   isLoading = false;
   form: FormGroup;
   imagePreview: string;
+  private authStatusSub: Subscription;
 
-  constructor(private postService: PostService, private route: ActivatedRoute) {
+  constructor(
+    private postService: PostService,
+    private route: ActivatedRoute,
+    private authService: AuthService
+  ) {
     this.form = new FormGroup({
       title: new FormControl(null, {
         validators: [Validators.required, Validators.minLength(3)],
@@ -36,6 +43,11 @@ export class PostCreateComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.authStatusSub = this.authService
+      .getAuthStateListener()
+      .subscribe((authStatus) => {
+        this.isLoading = false;
+      });
     this.route.paramMap.subscribe((paramMap) => {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
@@ -88,5 +100,9 @@ export class PostCreateComponent implements OnInit {
       this.imagePreview = reader.result as string;
     };
     reader.readAsDataURL(file);
+  }
+
+  ngOnDestroy() {
+    this.authStatusSub.unsubscribe();
   }
 }

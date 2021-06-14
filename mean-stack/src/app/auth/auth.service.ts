@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 
 import { AuthData } from './auth-data.model';
+import { environment } from 'src/environments/environment';
+
+const BACKEND_URL = environment.apiUrl + '/user/';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -33,37 +36,45 @@ export class AuthService {
 
   createUser(email: string, password: string) {
     const authData: AuthData = { email, password };
-    this.http
-      .post('http://localhost:3000/api/user/signup', authData)
-      .subscribe((result) => {
-        console.log(result);
-      });
+    this.http.post(BACKEND_URL + '/signup', authData).subscribe(
+      () => {
+        this.router.navigate(['/']);
+      },
+      (error) => {
+        this.authStateListener.next(false);
+      }
+    );
   }
 
   login(email: string, password: string) {
     const authData: AuthData = { email, password };
     this.http
       .post<{ token: string; expiresIn: number; userId: string }>(
-        'http://localhost:3000/api/user/login',
+        BACKEND_URL + '/login',
         authData
       )
-      .subscribe((result) => {
-        const token = result.token;
-        this.token = token;
-        if (token) {
-          const expiresInDuration = result.expiresIn;
-          this.setAuthTimer(expiresInDuration);
-          const now = new Date();
-          const expirationDate = new Date(
-            now.getTime() + expiresInDuration * 1000
-          );
-          this.isAuthenticated = true;
-          this.userId = result.userId;
-          this.authStateListener.next(true);
-          this.saveAuthData(token, expirationDate, this.userId);
-          this.router.navigate(['/']);
+      .subscribe(
+        (result) => {
+          const token = result.token;
+          this.token = token;
+          if (token) {
+            const expiresInDuration = result.expiresIn;
+            this.setAuthTimer(expiresInDuration);
+            const now = new Date();
+            const expirationDate = new Date(
+              now.getTime() + expiresInDuration * 1000
+            );
+            this.isAuthenticated = true;
+            this.userId = result.userId;
+            this.authStateListener.next(true);
+            this.saveAuthData(token, expirationDate, this.userId);
+            this.router.navigate(['/']);
+          }
+        },
+        (error) => {
+          this.authStateListener.next(false);
         }
-      });
+      );
   }
 
   autoAuthUser() {

@@ -9,20 +9,9 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
-  imports: [
-    MatButtonModule,
-    MatCheckboxModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatCardModule,
-    MatExpansionModule,
-    MatProgressSpinnerModule,
-    MatToolbarModule,
-    MatPaginatorModule,
-  ],
   exports: [
     MatButtonModule,
     MatCheckboxModule,
@@ -34,6 +23,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
     MatProgressSpinnerModule,
     MatToolbarModule,
     MatPaginatorModule,
+    MatDialogModule,
   ],
 })
 export class MaterialModule {}
