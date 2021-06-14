@@ -10,7 +10,9 @@ const app = express();
 
 mongoose
   .connect(
-    "mongodb+srv://vibhor:<password>@cluster0.ubtub.mongodb.net/node-angular?retryWrites=true&w=majority",
+    "mongodb+srv://vibhor:" +
+      process.env.MONGO_ATLAS_PW +
+      "@cluster0.ubtub.mongodb.net/node-angular?retryWrites=true&w=majority",
     { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true }
   )
   .then(() => {
